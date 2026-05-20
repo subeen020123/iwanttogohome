@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>퇴근 알리미</title>
+  <style>
+    :root {
+      --bg1: #f4f4f2;
+      --bg2: #e7e7e4;
+      --card: rgba(255, 255, 255, 0.92);
+      --text: #191919;
+      --muted: #707070;
+      --primary: #222222;
+      --primary-dark: #000000;
+      --accent: #777777;
+      --good: #111111;
+      --line: #d8d8d4;
+      --shadow: 0 22px 60px rgba(0, 0, 0, 0.11);
+      --radius: 28px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(0, 0, 0, 0.06), transparent 36%),
+        radial-gradient(circle at top right, rgba(0, 0, 0, 0.05), transparent 34%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+    }
+
+    .app {
+      width: min(100%, 460px);
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #191919;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.14);
+    }
+
+    h1 {
+      margin: 14px 0 8px;
+      font-size: clamp(38px, 10vw, 58px);
+      letter-spacing: -0.07em;
+      line-height: 1.02;
+      font-weight: 950;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      word-break: keep-all;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.76);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      padding: 22px;
+    }
+
+    .input-area {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 850;
+      color: #242424;
+    }
+
+    .time-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    input[type="time"] {
+      width: 100%;
+      min-height: 54px;
+      padding: 0 16px;
+      border: 1.5px solid var(--line);
+      border-radius: 18px;
+      background: #ffffff;
+      color: var(--text);
+      font-size: 22px;
+      font-weight: 850;
+      outline: none;
+      transition: 0.2s ease;
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="time"]:focus {
+      border-color: #222222;
+      box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.08);
+    }
+
+    button {
+      border: 0;
+      border-radius: 18px;
+      min-height: 54px;
+      padding: 0 16px;
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 14px 26px rgba(0, 0, 0, 0.15);
+      transition: transform 0.16s ease, background 0.16s ease, opacity 0.16s ease;
+      white-space: nowrap;
+    }
+
+    button:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    button:hover {
+      background: #000000;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .secondary {
+      background: #ffffff;
+      color: #202020;
+      box-shadow: none;
+      border: 1.5px solid var(--line);
+    }
+
+    .secondary:hover {
+      background: #f2f2ef;
+    }
+
+    .timers {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .timer-box {
+      padding: 16px;
+      border-radius: 22px;
+      background:
+        linear-gradient(135deg, rgba(0, 0, 0, 0.045), rgba(0, 0, 0, 0.018)),
+        rgba(255, 255, 255, 0.78);
+      text-align: center;
+      border: 1px solid rgba(0, 0, 0, 0.055);
+    }
+
+    .timer-box.main {
+      background:
+        linear-gradient(135deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.025)),
+        rgba(255, 255, 255, 0.84);
+    }
+
+    .status {
+      margin: 0 0 8px;
+      color: #333333;
+      font-size: 14px;
+      font-weight: 950;
+      letter-spacing: -0.02em;
+    }
+
+    .remaining {
+      margin: 0;
+      font-size: clamp(28px, 8.5vw, 44px);
+      line-height: 1;
+      letter-spacing: -0.06em;
+      font-weight: 950;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sub-remaining {
+      font-size: clamp(25px, 7.8vw, 36px);
+    }
+
+    .timer-caption {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+      font-weight: 750;
+      word-break: keep-all;
+    }
+
+    .cheer {
+      min-height: 46px;
+      margin: 12px 0 0;
+      color: #3f3f3f;
+      font-size: 16px;
+      line-height: 1.5;
+      font-weight: 780;
+      word-break: keep-all;
+      text-align: center;
+    }
+
+    .progress-wrap {
+      margin: 16px 0 12px;
+      height: 14px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #e2e2df;
+      border: 1px solid rgba(0, 0, 0, 0.045);
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #111111, #777777);
+      transition: width 0.5s ease;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .info {
+      padding: 14px 12px;
+      border-radius: 20px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+    }
+
+    .info span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+      margin-bottom: 5px;
+    }
+
+    .info strong {
+      font-size: 18px;
+      letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .done .remaining,
+    .stopped .remaining {
+      color: var(--good);
+    }
+
+    .empty-state {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      word-break: keep-all;
+      text-align: center;
+      padding: 18px 8px 8px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 16px;
+      color: rgba(25, 25, 25, 0.50);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 380px) {
+      body {
+        padding: 14px;
+      }
+
+      .card {
+        padding: 18px;
+        border-radius: 24px;
+      }
+
+      .time-row {
+        grid-template-columns: 1fr;
+      }
+
+      .button-row {
+        grid-template-columns: 1fr;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      button,
+      input[type="time"] {
+        min-height: 52px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero" aria-label="퇴근 알리미 소개">
+      <div class="badge">⚡ Time attack</div>
+      <h1>퇴근 알리미</h1>
+      <p class="subtitle">출근 시간을 입력하면 점심까지,<br />그리고 퇴근까지 남은 시간을 함께 보여드려요.</p>
+    </section>
+
+    <section class="card">
+      <div class="input-area">
+        <label for="startTime">오늘 출근 시간</label>
+        <div class="time-row">
+          <input id="startTime" type="time" aria-label="출근 시간 입력" />
+          <button id="nowBtn" type="button">지금 찍기</button>
+        </div>
+        <div class="button-row">
+          <button id="saveBtn" type="button">계산하기</button>
+          <button id="resetBtn" type="button" class="secondary">초기화</button>
+        </div>
+      </div>
+
+      <div id="timerArea">
+        <p class="empty-state">출근 시간을 입력하거나 <b>지금 찍기</b>를 눌러주세요.<br />오늘도 조용히, 단단하게 가보자구요 ☁️</p>
+      </div>
+    </section>
+
+    <footer>
+      Work timer · 오늘 하루 로컬 저장
+    </footer>
+  </main>
+
+  <script>
+    const WORK_HOURS = 9;
+    const LUNCH_START = "11:30";
+    const CHEER_INTERVAL_MINUTES = 10;
+
+    const startInput = document.getElementById("startTime");
+    const nowBtn = document.getElementById("nowBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const timerArea = document.getElementById("timerArea");
+
+    const STORAGE_KEY = "office-go-home-timer-daily-start-time";
+
+    const cheerMessages = [
+      "시작이 제일 어려운 법. 이미 출근했으니 오늘의 큰 산 하나 넘었어요 ☕",
+      "한 번에 다 하려고 하지 말고, 지금 할 일 하나만 잡아봐요.",
+      "괜찮아요. 오늘도 충분히 잘 해내고 있어요.",
+      "작은 일 하나 끝내는 것도 엄청난 전진이에요. 체크 표시 하나 가보자고요 ✓",
+      "시간은 조용히 흐르는 중. 점심도, 퇴근도 분명 가까워지고 있어요.",
+      "물 한 모금 마시고 어깨 힘 살짝 빼요. 오래 버티는 사람이 이겨요.",
+      "지금 페이스 좋아요. 너무 몰아붙이지 말고 안정적으로 가요.",
+      "오늘의 나, 생각보다 꽤 단단합니다. 아주 좋아요.",
+      "슬슬 리듬 탔어요. 일은 차분하게, 마음은 가볍게.",
+      "중간 지점이 가까워져요. 오전/오후의 나는 서로 응원 중입니다.",
+      "여기까지 온 것도 이미 성과예요. 잠깐 숨 고르고 다시 출발.",
+      "집중력이 흔들려도 괜찮아요. 10분만 다시 잡아보면 돼요.",
+      "퇴근이라는 단어가 점점 선명해지고 있어요. 조금만 더!",
+      "마무리 모드로 천천히 넘어가도 좋아요. 오늘도 수고 많았어요.",
+      "이제 남은 건 정리와 탈출뿐. 당신은 할 수 있다 🖤",
+      "거의 다 왔어요. 오늘의 에너지, 마지막까지 잘 아껴 써요.",
+      "퇴근이 가까워질수록 표정 관리가 어려워지는 시간입니다.",
+      "컴퓨터도 당신도 곧 쉬어야 해요. 조금만 더!",
+      "오늘도 버텼다, 해냈다, 멋졌다. 퇴근 준비 완료!",
+      "퇴근 가능 시간이에요. 오늘 하루도 정말 고생 많았어요 🎉"
+    ];
+
+    function pad(num) {
+      return String(num).padStart(2, "0");
+    }
+
+    function getTodayKey() {
+      const now = new Date();
+      return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+    }
+
+    function formatTime(date) {
+      return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+
+    function formatFullRemaining(ms) {
+      if (ms <= 0) return "00:00:00";
+
+      const totalSeconds = Math.floor(ms / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    }
+
+    function todayAt(timeString) {
+      const [hour, minute] = timeString.split(":").map(Number);
+      const date = new Date();
+      date.setHours(hour, minute, 0, 0);
+      return date;
+    }
+
+    function addHours(date, hours) {
+      const result = new Date(date);
+      result.setTime(result.getTime() + hours * 60 * 60 * 1000);
+      return result;
+    }
+
+    function saveDailyStartTime(timeValue) {
+      const data = {
+        date: getTodayKey(),
+        startTime: timeValue
+      };
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function loadDailyStartTime() {
+      const savedData = localStorage.getItem(STORAGE_KEY);
+
+      if (!savedData) return "";
+
+      try {
+        const parsed = JSON.parse(savedData);
+
+        if (parsed.date === getTodayKey() && parsed.startTime) {
+          return parsed.startTime;
+        }
+
+        localStorage.removeItem(STORAGE_KEY);
+        return "";
+      } catch (error) {
+        localStorage.removeItem(STORAGE_KEY);
+        return "";
+      }
+    }
+
+    function clearExpiredDailyStartTime() {
+      const savedData = localStorage.getItem(STORAGE_KEY);
+
+      if (!savedData) return;
+
+      try {
+        const parsed = JSON.parse(savedData);
+
+        if (parsed.date !== getTodayKey()) {
+          localStorage.removeItem(STORAGE_KEY);
+          startInput.value = "";
+        }
+      } catch (error) {
+        localStorage.removeItem(STORAGE_KEY);
+        startInput.value = "";
+      }
+    }
+
+    function getCheer(startTime, now, progressPercent, remainingMs) {
+      if (remainingMs <= 0) return cheerMessages[cheerMessages.length - 1];
+
+      if (now < startTime) {
+        return "입력한 출근 시간을 기준으로 오늘의 타이머를 준비했어요. 차분하게 가보자구요.";
+      }
+
+      const elapsedMinutes = Math.max(0, Math.floor((now - startTime) / 60000));
+      const tenMinuteBlock = Math.floor(elapsedMinutes / CHEER_INTERVAL_MINUTES);
+      const progressIndex = Math.floor((Math.max(0, Math.min(99, progressPercent)) / 100) * (cheerMessages.length - 2));
+      const messageIndex = (tenMinuteBlock + progressIndex) % (cheerMessages.length - 1);
+
+      return cheerMessages[messageIndex];
+    }
+
+    function render() {
+      clearExpiredDailyStartTime();
+
+      const startValue = startInput.value;
+
+      if (!startValue) {
+        timerArea.innerHTML = `
+          <p class="empty-state">출근 시간을 입력하거나 <b>지금 찍기</b>를 눌러주세요.<br />오늘도 조용히, 단단하게 가보자구요 ☁️</p>
+        `;
+        return;
+      }
+
+      const now = new Date();
+      const startTime = todayAt(startValue);
+      const lunchTime = todayAt(LUNCH_START);
+      const endTime = addHours(startTime, WORK_HOURS);
+
+      const totalMs = endTime - startTime;
+      const elapsedMs = now - startTime;
+      const remainingWorkMs = endTime - now;
+      const progress = Math.min(100, Math.max(0, (elapsedMs / totalMs) * 100));
+
+      const lunchRemainingMs = lunchTime - now;
+      const isLunchTimerStopped = lunchRemainingMs <= 0;
+      const isDone = remainingWorkMs <= 0;
+
+      const lunchTimerText = isLunchTimerStopped ? "00:00:00" : formatFullRemaining(lunchRemainingMs);
+      const workTimerText = formatFullRemaining(remainingWorkMs);
+
+      const lunchCaption = isLunchTimerStopped
+        ? "점심시간 도착 이후 멈춘 타이머"
+        : `${LUNCH_START} 점심시간까지 카운트다운`;
+
+      const workCaption = isDone
+        ? "퇴근 가능 시간이에요"
+        : `${formatTime(endTime)} 예상 퇴근`;
+
+      timerArea.innerHTML = `
+        <div class="timers">
+          <section class="timer-box ${isLunchTimerStopped ? "stopped" : ""}">
+            <p class="status">점심까지 남은 시간</p>
+            <p class="remaining sub-remaining">${lunchTimerText}</p>
+            <p class="timer-caption">${lunchCaption}</p>
+          </section>
+
+          <section class="timer-box main ${isDone ? "done" : ""}">
+            <p class="status">${isDone ? "퇴근 가능!" : "퇴근까지 남은 시간"}</p>
+            <p class="remaining">${workTimerText}</p>
+            <p class="timer-caption">${workCaption}</p>
+          </section>
+        </div>
+
+        <p class="cheer">${getCheer(startTime, now, progress, remainingWorkMs)}</p>
+
+        <div class="progress-wrap" aria-label="근무 진행률">
+          <div class="progress-bar" style="width: ${progress}%"></div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info">
+            <span>출근 시간</span>
+            <strong>${formatTime(startTime)}</strong>
+          </div>
+          <div class="info">
+            <span>점심 시간</span>
+            <strong>${LUNCH_START}</strong>
+          </div>
+          <div class="info">
+            <span>예상 퇴근</span>
+            <strong>${formatTime(endTime)}</strong>
+          </div>
+          <div class="info">
+            <span>현재 시간</span>
+            <strong>${formatTime(now)}</strong>
+          </div>
+        </div>
+      `;
+    }
+
+    function setNow() {
+      const now = new Date();
+      startInput.value = formatTime(now);
+      saveDailyStartTime(startInput.value);
+      render();
+    }
+
+    function saveStartTime() {
+      if (!startInput.value) {
+        alert("출근 시간을 먼저 입력해주세요!");
+        return;
+      }
+
+      saveDailyStartTime(startInput.value);
+      render();
+    }
+
+    function resetTimer() {
+      startInput.value = "";
+      localStorage.removeItem(STORAGE_KEY);
+      render();
+    }
+
+    nowBtn.addEventListener("click", setNow);
+    saveBtn.addEventListener("click", saveStartTime);
+    resetBtn.addEventListener("click", resetTimer);
+    startInput.addEventListener("change", saveStartTime);
+
+    startInput.value = loadDailyStartTime();
+
+    render();
+    setInterval(render, 1000);
+  </script>
+</body>
+</html>
